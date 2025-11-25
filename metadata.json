@@ -1,0 +1,7 @@
+{
+  "name": "Labib Enterprise Shop Management",
+  "description": "A colorful, dynamic, and modern shop management web application designed to simulate a desktop software experience. It includes features for dashboard analytics, product management, sales (POS), expenses, and customer tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
