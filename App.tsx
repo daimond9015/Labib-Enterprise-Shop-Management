@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   DashboardIcon, ProductIcon, SalesIcon, ExpenseIcon, CustomerIcon, ReportsIcon, SettingsIcon, LogoutIcon, MenuIcon, XIcon
 } from './components/ui/Icons';
@@ -9,8 +8,9 @@ import Sales from './components/Sales';
 import Expenses from './components/Expenses';
 import Customers from './components/Customers';
 import Reports from './components/Reports';
+import Settings from './components/Settings';
 
-import type { Product, Sale, Expense, Customer, Payment } from './types';
+import type { Product, Sale, Expense, Customer, Payment, Theme } from './types';
 
 // Mock Data - Reset to empty as per user request
 const initialProducts: Product[] = [];
@@ -255,6 +255,8 @@ const App: React.FC = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [activeView, setActiveView] = useState<View>('Dashboard');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'system');
+    
     const { 
         products, sales, expenses, customers,
         addProduct, updateProduct, deleteProduct, 
@@ -262,6 +264,26 @@ const App: React.FC = () => {
         addExpense, updateExpense, deleteExpense,
         addCustomer, updateCustomer, deleteCustomer, addCustomerPayment
     } = useShopData();
+
+    useEffect(() => {
+        const root = window.document.documentElement;
+        const isDark =
+            theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+        root.classList.toggle('dark', isDark);
+    }, [theme]);
+
+    const handleThemeChange = (newTheme: Theme) => {
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    };
+
+    const handleClearData = () => {
+        const keys = ['products', 'sales', 'expenses', 'customers'];
+        keys.forEach(key => localStorage.removeItem(key));
+        window.location.reload();
+    };
 
     if (!isLoggedIn) {
         return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -282,7 +304,7 @@ const App: React.FC = () => {
             case 'Reports':
                 return <Reports sales={sales} expenses={expenses} />;
             case 'Settings':
-                return <div className="p-8"><h1 className="text-3xl font-bold">{activeView}</h1><p>This feature is under construction.</p></div>
+                return <Settings theme={theme} onThemeChange={handleThemeChange} onClearData={handleClearData} />;
             default:
                 return <Dashboard products={products} sales={sales} expenses={expenses} onNavigate={setActiveView} />;
         }

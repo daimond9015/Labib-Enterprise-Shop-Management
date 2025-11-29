@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -54,3 +53,5 @@ export interface Customer {
   dueAmount: number;
   payments?: Payment[];
 }
+
+export type Theme = 'light' | 'dark' | 'system';
